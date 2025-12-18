@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  - port: 443
+    targetPort: 443
+    name: https
+  - port: 22
+    targetPort: 22
+    name: ssh
+  selector:
+    app: gitlab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:latest
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        - containerPort: 22
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: |
+            external_url 'http://localhost'
+            prometheus_monitoring['enable'] = false
+            gitlab_kas['enable'] = false
+            registry['enable'] = false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab-proxy
+  labels:
+    app: gitlab-proxy
+spec:
+  ports:
+  - port: 8443
+    targetPort: 8443
+    name: https
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: gitlab-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-proxy
+  labels:
+    app: gitlab-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab-proxy
+  template:
+    metadata:
+      labels:
+        app: gitlab-proxy
+    spec:
+      containers:
+      - name: proxy
+        image: localhost/gitlab-proxy:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8443
+        - containerPort: 9090
+        env:
+        - name: UPSTREAM_URL
+          value: "http://gitlab"
+        - name: GITLAB_ADMIN_TOKEN
+          value: "glpat-_1Nm-uECqaVYndaOuUH1GG86MQp1OjEH.01.0w0w5stl6"

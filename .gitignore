@@ -1,0 +1,19 @@
+# Binaries
+proxy-bin
+proxy-bin-*
+
+# Certificates (Sensitive)
+certs/
+old_certs/
+*.crt
+*.key
+*.csr
+
+# Logs
+*.log
+
+# Docker/Podman artifacts
+*.tar
+
+# OS
+.DS_Store
