@@ -17,3 +17,6 @@ old_certs/
 
 # OS
 .DS_Store
+
+# Bazel
+bazel-*
