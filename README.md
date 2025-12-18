@@ -25,13 +25,16 @@ See [Threat Model](docs/threat_model.md) for security analysis and risk mitigati
     ./scripts/gen-certs.sh
     ```
 
-2.  **Build Proxy**:
+2.  **Build & Test (Bazel)**:
     ```bash
-    # Build binary
-    CGO_ENABLED=0 go build -o proxy-bin cmd/proxy/main.go
+    # Run unit tests
+    bazel test //...
+
+    # Build the application
+    bazel build //java/src/main/java/com/gitlab/proxy:Main
     
-    # Build container
-    podman build -t localhost/gitlab-proxy:latest .
+    # (Optional) Build container image
+    # bazel build //:proxy_image
     ```
 
 3.  **Deploy**:
@@ -86,7 +89,9 @@ curl http://localhost:9090/metrics
 
 ## Structure
 
-*   `cmd/proxy/`: Source code for the Go proxy.
+*   `java/src/main/java/`: Java 25 source code (SimpleHttpServer).
+*   `MODULE.bazel`: Bazel dependency definitions (Bzlmod).
+*   `BUILD`: Bazel build rules.
 *   `scripts/`: Utility scripts (certificate generation).
 *   `docs/`: Detailed documentation.
 *   `gitlab-basic.yaml`: Kubernetes manifests for GitLab and Proxy.

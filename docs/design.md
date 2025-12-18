@@ -7,7 +7,7 @@ This document details the design and architecture of the GitLab mTLS Proxy, a se
 
 The system consists of three main components running within a Kubernetes cluster:
 1.  **Clients**: Users or automated systems possessing a valid X.509 Client Certificate.
-2.  **mTLS Proxy**: A custom Go service that terminates mTLS, maps Common Names (CN) to GitLab User IDs, and manages authentication tokens.
+2.  **mTLS Proxy**: A custom **Java 25** service (using `com.sun.net.httpserver`) that terminates mTLS, maps Common Names (CN) to GitLab User IDs, and manages authentication tokens.
 3.  **GitLab**: Standard GitLab installation (Omnibus/Helm) listening on HTTP.
 
 ### 2.1 High-Level Deployment
@@ -112,7 +112,7 @@ sequenceDiagram
 
 ## 6. Limitations
 *   No robust readiness probes for upstream dependency (basic TCP dial).
-*   User Map is currently hardcoded in `main.go` source (requires rebuild to add users).
+*   User Map is currently hardcoded in `Config.java` source (requires rebuild to add users).
 *   No support for CRL/OCSP revocation lists (revocation requires removing CA or code update).
 *   **Token Lifespan Limitation**: GitLab API `expires_at` field only accepts `YYYY-MM-DD` format. This enforces a minimum token validity of ~24 hours. Tokens evicted from the proxy cache may still be valid in GitLab until the end of the day.
 

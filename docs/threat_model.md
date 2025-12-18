@@ -43,7 +43,7 @@ This document analyzes the security risks associated with the GitLab mTLS Proxy 
 *   **Mitigation**:
     *   **Env Var Source**: Token is injected via Environment Variable (K8s Secret recommended for production).
     *   **Log Sanitization**: The proxy logs must *never* print the raw `GITLAB_ADMIN_TOKEN` or generated user tokens.
-    *   **Memory Safety**: Go's memory management reduces buffer leaks, though heap dumps are a risk if the container is breached.
+    *   **Memory Safety**: Java's managed memory (JVM) reduces buffer leaks, though heap dumps are a risk if the container is breached.
 
 ### 3.5 Denial of Service (DoS)
 *   **Threat**: An attacker spams the proxy with requests, causing it to flood GitLab with Token Generation calls.
