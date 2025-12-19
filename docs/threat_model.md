@@ -29,6 +29,7 @@ This document analyzes the security risks associated with the GitLab mTLS Proxy 
 *   **Mitigation**:
     *   **Kubernetes Networking**: Traffic stays within the cluster network (ClusterIP).
     *   **Trusted Network**: Assumption that the internal cluster network is a trusted zone.
+    *   **Upstream TLS**: (Recommended) Configuring GitLab with TLS (`https://...`) ensures cryptographic integrity and confidentiality between Proxy and GitLab, preventing MITM attacks even within the cluster.
 
 ### 3.3 Repudiation
 *   **Threat**: A user performs a malicious action via the proxy, but denies it.
@@ -44,6 +45,7 @@ This document analyzes the security risks associated with the GitLab mTLS Proxy 
     *   **Env Var Source**: Token is injected via Environment Variable (K8s Secret recommended for production).
     *   **Log Sanitization**: The proxy logs must *never* print the raw `GITLAB_ADMIN_TOKEN` or generated user tokens.
     *   **Memory Safety**: Java's managed memory (JVM) reduces buffer leaks, though heap dumps are a risk if the container is breached.
+    *   **Transport Encryption**: Using Upstream TLS prevents the Admin Token from leaking on the wire during token generation calls.
 
 ### 3.5 Denial of Service (DoS)
 *   **Threat**: An attacker spams the proxy with requests, causing it to flood GitLab with Token Generation calls.
